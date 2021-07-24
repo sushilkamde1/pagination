@@ -1,23 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./components/User.css";
+import axios from "axios";
+import Users from "./components/Users";
+import Pagination from "./components/Pagination";
 
 function App() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+
+  // fetch user data
+  useEffect(() => {
+    const fetchUser = async () => {
+      setLoading(true);
+      const res = await axios.get(`https://reqres.in/api/users?page=${page}`);
+      setLoading(false);
+      setUsers(res.data.data);
+
+      setTotalPages(res.data.total_pages);
+    };
+    fetchUser();
+  }, [page]);
+
+  // handle click event
+  const handleClick = (num) => {
+    setPage(num);
+  };
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1 className="">Pagination</h1>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <>
+          <Users users={users} page={page} />
+          <Pagination totalpages={totalPages} handleClick={handleClick} />
+        </>
+      )}
     </div>
   );
 }
